@@ -1,13 +1,3 @@
-## Instalación
-
-```bash
-# Instalar dependencias
-pnpm install
-
-# MongoDB debe estar corriendo localmente
-# Asegurar que Docker tiene PostgreSQL activo
-```
-
 ### Usuario administrador por defecto
 Se crea automaticamente si la tabla de usuarios esta vacia.
 
@@ -78,18 +68,12 @@ PASSWORD_RESET_EXPIRY_HOURS=1
 ## Ejecución
 
 ```bash
-# Iniciar servicios de Docker
 docker compose up -d
 
-# Iniciar el servidor en desarrollo
-pnpm dev
+pnpm install
 
-# Iniciar en producción
-pnpm start
+pnpm run dev
 
-# Ejecutar linter
-pnpm lint
-```
 
 El servidor estará disponible en: `http://localhost:3005/api/v1`
 
@@ -97,22 +81,7 @@ El servidor estará disponible en: `http://localhost:3005/api/v1`
 
 ## Endpoints - Referencia Completa
 
-### Base URL
-```
-http://localhost:3005/api/v1
-```
 
----
-
-## Health Check
-
-### GET `/health`
-Verifica el estado del servicio.
-
-**cURL:**
-```bash
-curl http://localhost:3005/api/v1/health
-```
 
 **Respuesta (200):**
 ```json
@@ -753,33 +722,6 @@ curl -X PUT http://localhost:3005/api/v1/users/target-user-id/role \
 }
 ```
 
----
-
-## Códigos de Error Comunes
-
-| Código | Descripción |
-|--------|-------------|
-| 400 | Validación fallida - datos inválidos |
-| 401 | No autenticado - token faltante o inválido |
-| 403 | No autorizado - no tienes permiso |
-| 404 | Recurso no encontrado |
-| 409 | Conflicto - email o username duplicado |
-| 500 | Error interno del servidor |
-
----
-
-## Headers Requeridos
-
-Para endpoints que requieren autenticación:
-
-```
-Authorization: Bearer <JWT_TOKEN>
-Content-Type: application/json
-```
-
-Obtén el token en `/auth/login` o `/auth/register`.
-
----
 
 ## Categorías de Publicaciones
 
@@ -793,29 +735,3 @@ Obtén el token en `/auth/login` o `/auth/register`.
 - Business
 - Other
 ```
-
----
-
-## Limitación de Solicitudes
-
-- **Rutas de autenticación:** 5 solicitudes por minuto
-- **Rutas generales:** 20 solicitudes por minuto
-
----
-
-## Seguridad
-
-- JWT (JSON Web Tokens)
-- Argon2 (Hashing de contraseñas)
-- CORS configurado
-- Helmet (Headers de seguridad)
-- Rate Limiting
-- Validación exhaustiva
-- Verificación de propiedad
-- MongoDB injection prevention
-
----
-
-
-
-
