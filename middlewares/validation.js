@@ -1,8 +1,5 @@
 import { body, validationResult } from 'express-validator';
 
-/**
- * Middleware para procesar resultados de validación
- */
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -19,9 +16,6 @@ export const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-/**
- * Validaciones para el registro de usuario
- */
 export const validateRegister = [
   body('name')
     .trim()
@@ -72,9 +66,6 @@ export const validateRegister = [
   handleValidationErrors,
 ];
 
-/**
- * Validaciones para el login
- */
 export const validateLogin = [
   body('emailOrUsername')
     .trim()
@@ -86,18 +77,12 @@ export const validateLogin = [
   handleValidationErrors,
 ];
 
-/**
- * Validaciones para verificación de email
- */
 export const validateVerifyEmail = [
   body('token').notEmpty().withMessage('El token de verificación es requerido'),
 
   handleValidationErrors,
 ];
 
-/**
- * Validaciones para reenvío de verificación
- */
 export const validateResendVerification = [
   body('email')
     .trim()
@@ -109,9 +94,6 @@ export const validateResendVerification = [
   handleValidationErrors,
 ];
 
-/**
- * Validaciones para forgot password
- */
 export const validateForgotPassword = [
   body('email')
     .trim()
@@ -123,9 +105,6 @@ export const validateForgotPassword = [
   handleValidationErrors,
 ];
 
-/**
- * Validaciones para reset password
- */
 export const validateResetPassword = [
   body('token').notEmpty().withMessage('El token de recuperación es requerido'),
 

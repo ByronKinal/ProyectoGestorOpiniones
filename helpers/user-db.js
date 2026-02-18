@@ -9,11 +9,6 @@ import { USER_ROLE } from './role-constants.js';
 import { hashPassword } from '../utils/password-utils.js';
 import { Op } from 'sequelize';
 
-/**
- * Helper para buscar un usuario por email o username
- * @param {string} emailOrUsername - Email o username del usuario
- * @returns {Promise<Object|null>} Usuario encontrado o null
- */
 export const findUserByEmailOrUsername = async (emailOrUsername) => {
   try {
     const user = await User.findOne({
@@ -91,7 +86,6 @@ export const createNewUser = async (userData) => {
 
     const hashedPassword = await hashPassword(password);
 
-    // Crear el usuario principal
     const user = await User.create(
       {
         Name: name,
@@ -99,12 +93,11 @@ export const createNewUser = async (userData) => {
         Username: username.toLowerCase(),
         Email: email.toLowerCase(),
         Password: hashedPassword,
-        Status: false, // Empieza desactivado hasta que verifique el email
+        Status: false,
       },
       { transaction }
     );
 
-    // Crear el perfil del usuario
     const { getDefaultAvatarPath } = await import(
       '../helpers/cloudinary-service.js'
     );
@@ -119,7 +112,6 @@ export const createNewUser = async (userData) => {
       { transaction }
     );
 
-    // Crear el registro de email
     await UserEmail.create(
       {
         UserId: user.Id,
@@ -128,7 +120,6 @@ export const createNewUser = async (userData) => {
       { transaction }
     );
 
-    // Crear el registro de reset de contraseña
     await UserPasswordReset.create(
       {
         UserId: user.Id,
@@ -136,7 +127,6 @@ export const createNewUser = async (userData) => {
       { transaction }
     );
 
-    // Asignar rol USER_ROLE por defecto (matching .NET DataSeeder)
     const userRole = await Role.findOne(
       { where: { Name: USER_ROLE } },
       { transaction }
@@ -157,7 +147,6 @@ export const createNewUser = async (userData) => {
 
     await transaction.commit();
 
-    // Obtener el usuario completo con todas las relaciones
     const completeUser = await findUserById(user.Id);
     return completeUser;
   } catch (error) {
@@ -188,7 +177,6 @@ export const markEmailAsVerified = async (userId) => {
   const transaction = await User.sequelize.transaction();
 
   try {
-    // Marcar email como verificado
     await UserEmail.update(
       {
         EmailVerified: true,
@@ -201,7 +189,6 @@ export const markEmailAsVerified = async (userId) => {
       }
     );
 
-    // Activar el usuario
     await User.update(
       {
         Status: true,
@@ -260,11 +247,6 @@ export const findUserByEmail = async (email) => {
   }
 };
 
-/**
- * Helper para buscar un usuario por token de verificación de email (matching .NET)
- * @param {string} token - Token de verificación de email
- * @returns {Promise<Object|null>} Usuario encontrado o null
- */
 export const findUserByEmailVerificationToken = async (token) => {
   try {
     const user = await User.findOne({
@@ -275,7 +257,7 @@ export const findUserByEmailVerificationToken = async (token) => {
           where: {
             EmailVerificationToken: token,
             EmailVerificationTokenExpiry: {
-              [Op.gt]: new Date(), // Token no expirado
+              [Op.gt]: new Date(),
             },
           },
         },
@@ -297,11 +279,6 @@ export const findUserByEmailVerificationToken = async (token) => {
   }
 };
 
-/**
- * Helper para buscar un usuario por token de reset de password (matching .NET)
- * @param {string} token - Token de reset de password
- * @returns {Promise<Object|null>} Usuario encontrado o null
- */
 export const findUserByPasswordResetToken = async (token) => {
   try {
     const user = await User.findOne({
@@ -312,7 +289,7 @@ export const findUserByPasswordResetToken = async (token) => {
           where: {
             PasswordResetToken: token,
             PasswordResetTokenExpiry: {
-              [Op.gt]: new Date(), // Token no expirado
+              [Op.gt]: new Date(),
             },
           },
         },
@@ -338,7 +315,6 @@ export const updateUserPassword = async (userId, hashedPassword) => {
   const transaction = await User.sequelize.transaction();
 
   try {
-    // Actualizar contraseña
     await User.update(
       {
         Password: hashedPassword,
@@ -349,7 +325,6 @@ export const updateUserPassword = async (userId, hashedPassword) => {
       }
     );
 
-    // Limpiar token de reset
     await UserPasswordReset.update(
       {
         PasswordResetToken: null,

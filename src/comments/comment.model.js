@@ -39,7 +39,6 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-// Índices para mejora de rendimiento
 commentSchema.index({ postId: 1, createdAt: 1 });
 commentSchema.index({ userId: 1, createdAt: -1 });
 

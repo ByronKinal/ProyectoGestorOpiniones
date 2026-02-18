@@ -39,7 +39,6 @@ export const getUsersByRole = async (roleName) => {
 };
 
 export const setUserSingleRole = async (user, roleName, sequelize) => {
-  // Normalize
   const normalized = (roleName || '').trim().toUpperCase();
   if (!ALLOWED_ROLES.includes(normalized)) {
     const err = new Error('Role not allowed. Use ADMIN_ROLE or USER_ROLE');
@@ -48,7 +47,6 @@ export const setUserSingleRole = async (user, roleName, sequelize) => {
   }
 
   return sequelize.transaction(async (t) => {
-    // If demoting an admin, ensure not the last one
     const isUserAdmin = (user.UserRoles || []).some(
       (r) => r.Role?.Name === 'ADMIN_ROLE'
     );
@@ -61,7 +59,6 @@ export const setUserSingleRole = async (user, roleName, sequelize) => {
       }
     }
 
-    // Ensure role exists
     const role = await getRoleByName(normalized);
     if (!role) {
       const err = new Error(`Role ${normalized} not found`);
@@ -69,10 +66,9 @@ export const setUserSingleRole = async (user, roleName, sequelize) => {
       throw err;
     }
 
-    // Remove existing roles for user
     await UserRole.destroy({ where: { UserId: user.Id }, transaction: t });
 
-    // Assign new role
+    await UserRole.create(
     await UserRole.create(
       {
         UserId: user.Id,
@@ -81,7 +77,6 @@ export const setUserSingleRole = async (user, roleName, sequelize) => {
       { transaction: t }
     );
 
-    // Reload user with roles
     const updated = await User.findByPk(user.Id, {
       include: [
         { model: UserProfile, as: 'UserProfile' },

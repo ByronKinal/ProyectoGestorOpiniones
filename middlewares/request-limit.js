@@ -1,7 +1,6 @@
 import rateLimit from 'express-rate-limit';
 import { config } from '../configs/config.js';
 
-// Rate limiter general para la API
 export const requestLimit = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.maxRequests,
@@ -22,7 +21,6 @@ export const requestLimit = rateLimit({
   },
 });
 
-// Rate limiter específico para endpoints de autenticación
 export const authRateLimit = rateLimit({
   windowMs: config.rateLimit.authWindowMs,
   max: config.rateLimit.authMaxRequests,
@@ -45,10 +43,9 @@ export const authRateLimit = rateLimit({
   },
 });
 
-// Rate limiter para email endpoints (más restrictivo pero más razonable)
 export const emailRateLimit = rateLimit({
-  windowMs: config.rateLimit.emailWindowMs, // 15 minutos
-  max: config.rateLimit.emailMaxRequests, // máximo 3 emails por 15 minutos
+  windowMs: config.rateLimit.emailWindowMs,
+  max: config.rateLimit.emailMaxRequests,
   message: {
     success: false,
     message: 'Demasiados emails enviados, intenta de nuevo en 15 minutos.',

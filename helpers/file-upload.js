@@ -4,14 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { config } from '../configs/config.js';
 import fs from 'fs';
 
-// Crear el directorio de uploads si no existe
 const createUploadDir = () => {
   if (!fs.existsSync(config.upload.uploadPath)) {
     fs.mkdirSync(config.upload.uploadPath, { recursive: true });
   }
 };
 
-// Configuración de almacenamiento
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     createUploadDir();
@@ -23,7 +21,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// Filtro de archivos
 const fileFilter = (req, file, cb) => {
   if (config.upload.allowedTypes.includes(file.mimetype)) {
     cb(null, true);
@@ -37,7 +34,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configuración de multer
 export const upload = multer({
   storage: storage,
   limits: {
@@ -46,9 +42,6 @@ export const upload = multer({
   fileFilter: fileFilter,
 });
 
-/**
- * Middleware para manejar errores de upload
- */
 export const handleUploadError = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {

@@ -4,10 +4,6 @@ import { Post } from './post.model.js';
 import { Comment } from '../comments/comment.model.js';
 import { findUserById } from '../../helpers/user-db.js';
 
-/**
- * GET /api/v1/posts
- * Obtener todas las publicaciones con paginación
- */
 export const getAllPosts = [
   asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, category, search } = req.query;
@@ -46,10 +42,6 @@ export const getAllPosts = [
   }),
 ];
 
-/**
- * GET /api/v1/posts/:postId
- * Obtener una publicación por ID con sus comentarios
- */
 export const getPostById = [
   asyncHandler(async (req, res) => {
     const { postId } = req.params;
@@ -75,17 +67,12 @@ export const getPostById = [
   }),
 ];
 
-/**
- * POST /api/v1/posts
- * Crear una nueva publicación
- */
 export const createPost = [
   validateJWT,
   asyncHandler(async (req, res) => {
     const { title, category, content } = req.body;
     const userId = req.userId;
 
-    // Obtener información del usuario
     const user = await findUserById(userId);
     if (!user) {
       return res
@@ -111,10 +98,6 @@ export const createPost = [
   }),
 ];
 
-/**
- * PUT /api/v1/posts/:postId
- * Editar una publicación (solo el propietario)
- */
 export const updatePost = [
   validateJWT,
   asyncHandler(async (req, res) => {
@@ -129,7 +112,6 @@ export const updatePost = [
         .json({ success: false, message: 'Post not found' });
     }
 
-    // Verificar que el usuario sea el propietario
     if (post.userId !== userId) {
       return res.status(403).json({
         success: false,
@@ -137,7 +119,6 @@ export const updatePost = [
       });
     }
 
-    // Actualizar campos
     if (title) post.title = title;
     if (category) post.category = category;
     if (content) post.content = content;
@@ -153,10 +134,6 @@ export const updatePost = [
   }),
 ];
 
-/**
- * DELETE /api/v1/posts/:postId
- * Eliminar una publicación (solo el propietario)
- */
 export const deletePost = [
   validateJWT,
   asyncHandler(async (req, res) => {
@@ -170,7 +147,6 @@ export const deletePost = [
         .json({ success: false, message: 'Post not found' });
     }
 
-    // Verificar que el usuario sea el propietario
     if (post.userId !== userId) {
       return res.status(403).json({
         success: false,
@@ -178,7 +154,6 @@ export const deletePost = [
       });
     }
 
-    // Eliminar la publicación y todos sus comentarios
     await Post.findByIdAndDelete(postId);
     await Comment.deleteMany({ postId });
 
@@ -189,10 +164,6 @@ export const deletePost = [
   }),
 ];
 
-/**
- * GET /api/v1/posts/user/:userId
- * Obtener todas las publicaciones de un usuario
- */
 export const getUserPosts = [
   asyncHandler(async (req, res) => {
     const { userId } = req.params;

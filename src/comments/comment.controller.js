@@ -4,17 +4,12 @@ import { Comment } from './comment.model.js';
 import { Post } from '../posts/post.model.js';
 import { findUserById } from '../../helpers/user-db.js';
 
-/**
- * GET /api/v1/posts/:postId/comments
- * Obtener todos los comentarios de una publicación
- */
 export const getCommentsByPost = [
   asyncHandler(async (req, res) => {
     const { postId } = req.params;
     const { page = 1, limit = 20 } = req.query;
     const skip = (page - 1) * limit;
 
-    // Verificar que la publicación existe
     const post = await Post.findById(postId);
     if (!post) {
       return res
@@ -45,10 +40,6 @@ export const getCommentsByPost = [
   }),
 ];
 
-/**
- * POST /api/v1/posts/:postId/comments
- * Crear un nuevo comentario
- */
 export const createComment = [
   validateJWT,
   asyncHandler(async (req, res) => {
@@ -56,7 +47,6 @@ export const createComment = [
     const { content } = req.body;
     const userId = req.userId;
 
-    // Verificar que la publicación existe
     const post = await Post.findById(postId);
     if (!post) {
       return res
@@ -64,7 +54,6 @@ export const createComment = [
         .json({ success: false, message: 'Post not found' });
     }
 
-    // Obtener información del usuario
     const user = await findUserById(userId);
     if (!user) {
       return res
@@ -81,7 +70,6 @@ export const createComment = [
 
     const savedComment = await newComment.save();
 
-    // Incrementar contador de comentarios en la publicación
     post.commentsCount = (post.commentsCount || 0) + 1;
     await post.save();
 
@@ -93,10 +81,6 @@ export const createComment = [
   }),
 ];
 
-/**
- * PUT /api/v1/comments/:commentId
- * Editar un comentario (solo el propietario)
- */
 export const updateComment = [
   validateJWT,
   asyncHandler(async (req, res) => {
@@ -111,7 +95,6 @@ export const updateComment = [
         .json({ success: false, message: 'Comment not found' });
     }
 
-    // Verificar que el usuario sea el propietario
     if (comment.userId !== userId) {
       return res.status(403).json({
         success: false,
@@ -132,10 +115,6 @@ export const updateComment = [
   }),
 ];
 
-/**
- * DELETE /api/v1/comments/:commentId
- * Eliminar un comentario (solo el propietario)
- */
 export const deleteComment = [
   validateJWT,
   asyncHandler(async (req, res) => {
@@ -149,7 +128,6 @@ export const deleteComment = [
         .json({ success: false, message: 'Comment not found' });
     }
 
-    // Verificar que el usuario sea el propietario
     if (comment.userId !== userId) {
       return res.status(403).json({
         success: false,
@@ -159,10 +137,9 @@ export const deleteComment = [
 
     const postId = comment.postId;
 
-    // Eliminar el comentario
     await Comment.findByIdAndDelete(commentId);
 
-    // Decrementar contador de comentarios en la publicación
+    const post = await Post.findById(postId);
     const post = await Post.findById(postId);
     if (post && post.commentsCount > 0) {
       post.commentsCount -= 1;
@@ -176,10 +153,6 @@ export const deleteComment = [
   }),
 ];
 
-/**
- * GET /api/v1/comments/:commentId
- * Obtener un comentario por ID
- */
 export const getCommentById = [
   asyncHandler(async (req, res) => {
     const { commentId } = req.params;
