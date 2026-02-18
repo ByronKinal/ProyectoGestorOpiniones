@@ -74,6 +74,7 @@ pnpm install
 
 pnpm run dev
 
+crear el .env 
 
 El servidor estará disponible en: `http://localhost:3005/api/v1`
 
