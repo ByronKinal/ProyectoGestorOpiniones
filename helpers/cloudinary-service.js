@@ -4,7 +4,7 @@ import fs from 'fs/promises';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-cloudinary.config({
+
 cloudinary.config({
   cloud_name: config.cloudinary.cloudName,
   api_key: config.cloudinary.apiKey,
@@ -26,7 +26,6 @@ export const uploadImage = async (filePath, fileName) => {
 
     const result = await cloudinary.uploader.upload(filePath, options);
 
-    try {
     try {
       await fs.unlink(filePath);
     } catch {
@@ -120,3 +119,4 @@ export default {
   getDefaultAvatarUrl,
   getDefaultAvatarPath,
 };
+

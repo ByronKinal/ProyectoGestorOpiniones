@@ -140,7 +140,6 @@ export const deleteComment = [
     await Comment.findByIdAndDelete(commentId);
 
     const post = await Post.findById(postId);
-    const post = await Post.findById(postId);
     if (post && post.commentsCount > 0) {
       post.commentsCount -= 1;
       await post.save();

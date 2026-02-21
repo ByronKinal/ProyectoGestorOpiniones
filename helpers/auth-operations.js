@@ -116,7 +116,6 @@ export const registerUserHelper = async (userData) => {
     const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await updateEmailVerificationToken(
-    await updateEmailVerificationToken(
       newUser.Id,
       verificationToken,
       tokenExpiry
@@ -357,7 +356,6 @@ export const resetPasswordHelper = async (token, newPassword) => {
 
     await updateUserPassword(user.Id, hashedPassword);
 
-    try {
     try {
       const { sendPasswordChangedEmail } = await import('./email-service.js');
       Promise.resolve()
