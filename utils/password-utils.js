@@ -42,7 +42,6 @@ const verifyDotNetHashManually = async (password, hashedPassword) => {
     const expectedHash = Buffer.from(expectedHashB64, 'base64');
 
     const computedHash = await argon2.hash(password, {
-    const computedHash = await argon2.hash(password, {
       type: argon2.argon2id,
       memoryCost: params.m || 102400,
       timeCost: params.t || 2,

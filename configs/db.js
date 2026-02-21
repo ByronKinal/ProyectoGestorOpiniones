@@ -1,6 +1,7 @@
 'use strict';
 
 import { Sequelize } from 'sequelize';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -28,6 +29,9 @@ export const sequelize = new Sequelize({
   },
 });
 
+const mongodbUri =
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/opinion_system';
+
 export const dbConnection = async () => {
   try {
     console.log('PostgreSQL | Trying to connect...');
@@ -47,6 +51,26 @@ export const dbConnection = async () => {
     console.error('PostgreSQL | Error:', error.message);
     console.error('Stack trace:', error.stack);
     process.exit(1);
+  }
+};
+
+export const connectMongoDB = async () => {
+  try {
+    await mongoose.connect(mongodbUri);
+    console.log('MongoDB connected successfully');
+    return mongoose.connection;
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    throw error;
+  }
+};
+
+export const disconnectMongoDB = async () => {
+  try {
+    await mongoose.disconnect();
+    console.log('MongoDB disconnected');
+  } catch (error) {
+    console.error('Error disconnecting MongoDB:', error.message);
   }
 };
 

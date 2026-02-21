@@ -69,7 +69,6 @@ export const setUserSingleRole = async (user, roleName, sequelize) => {
     await UserRole.destroy({ where: { UserId: user.Id }, transaction: t });
 
     await UserRole.create(
-    await UserRole.create(
       {
         UserId: user.Id,
         RoleId: role.Id,
