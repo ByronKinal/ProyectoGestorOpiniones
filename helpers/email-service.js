@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 import { config } from '../configs/config.js';
 
-// Configurar el transportador de email (aligned with .NET SmtpSettings)
 const createTransporter = () => {
   if (!config.smtp.username || !config.smtp.password) {
     console.warn(
@@ -13,15 +12,14 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host: config.smtp.host,
     port: config.smtp.port,
-    secure: config.smtp.enableSsl, // true para 465, false para 587
+    secure: config.smtp.enableSsl,
     auth: {
       user: config.smtp.username,
       pass: config.smtp.password,
     },
-    // Evitar que las peticiones HTTP queden colgadas si SMTP no responde
-    connectionTimeout: 10_000, // 10s
-    greetingTimeout: 10_000, // 10s
-    socketTimeout: 10_000, // 10s
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 10_000,
     tls: {
       rejectUnauthorized: false,
     },
@@ -42,7 +40,7 @@ export const sendVerificationEmail = async (email, name, verificationToken) => {
     const mailOptions = {
       from: `${config.smtp.fromName} <${config.smtp.fromEmail}>`,
       to: email,
-      subject: 'Verify your email address', // Aligned with .NET
+      subject: 'Verify your email address',
       html: `
         <h2>Welcome ${name}!</h2>
         <p>Please verify your email address by clicking the link below:</p>
@@ -75,7 +73,7 @@ export const sendPasswordResetEmail = async (email, name, resetToken) => {
     const mailOptions = {
       from: `${config.smtp.fromName} <${config.smtp.fromEmail}>`,
       to: email,
-      subject: 'Reset your password', // Aligned with .NET
+      subject: 'Reset your password',
       html: `
         <h2>Password Reset Request</h2>
         <p>Hello ${name},</p>
@@ -106,7 +104,7 @@ export const sendWelcomeEmail = async (email, name) => {
     const mailOptions = {
       from: `${config.smtp.fromName} <${config.smtp.fromEmail}>`,
       to: email,
-      subject: 'Welcome to AuthDotnet!', // Aligned with .NET
+      subject: 'Welcome to AuthDotnet!',
       html: `
         <h2>Welcome to AuthDotnet, ${name}!</h2>
         <p>Your account has been successfully verified and activated.</p>
@@ -132,7 +130,7 @@ export const sendPasswordChangedEmail = async (email, name) => {
     const mailOptions = {
       from: `${config.smtp.fromName} <${config.smtp.fromEmail}>`,
       to: email,
-      subject: 'Password Changed Successfully', // More aligned with .NET style
+      subject: 'Password Changed Successfully',
       html: `
         <h2>Password Changed</h2>
         <p>Hello ${name},</p>

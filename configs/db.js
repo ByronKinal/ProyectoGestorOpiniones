@@ -1,11 +1,11 @@
 'use strict';
 
 import { Sequelize } from 'sequelize';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Configuración de PostgreSQL (igual que la API .NET)
 export const sequelize = new Sequelize({
   dialect: 'postgres',
   host: process.env.DB_HOST,
@@ -15,11 +15,11 @@ export const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD,
   logging: process.env.DB_SQL_LOGGING === 'true' ? console.log : false,
   define: {
-    freezeTableName: true, // Usar nombres exactos sin pluralización
+    freezeTableName: true,
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    underscored: true, // Usar snake_case para todos los campos
+    underscored: true,
   },
   pool: {
     max: 10,
@@ -29,7 +29,9 @@ export const sequelize = new Sequelize({
   },
 });
 
-// Función para conectar a la base de datos
+const mongodbUri =
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/opinion_system';
+
 export const dbConnection = async () => {
   try {
     console.log('PostgreSQL | Trying to connect...');
@@ -38,7 +40,6 @@ export const dbConnection = async () => {
     console.log('PostgreSQL | Connected to PostgreSQL');
     console.log('PostgreSQL | Connection to database established');
 
-    // Sincronizar modelos en desarrollo
     if (process.env.NODE_ENV === 'development') {
       const syncLogging =
         process.env.DB_SQL_LOGGING === 'true' ? console.log : false;
@@ -53,7 +54,26 @@ export const dbConnection = async () => {
   }
 };
 
-// Graceful shutdown handlers
+export const connectMongoDB = async () => {
+  try {
+    await mongoose.connect(mongodbUri);
+    console.log('MongoDB connected successfully');
+    return mongoose.connection;
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    throw error;
+  }
+};
+
+export const disconnectMongoDB = async () => {
+  try {
+    await mongoose.disconnect();
+    console.log('MongoDB disconnected');
+  } catch (error) {
+    console.error('Error disconnecting MongoDB:', error.message);
+  }
+};
+
 const gracefulShutdown = async (signal) => {
   console.log(
     `PostgreSQL | Received ${signal}. Closing database connection...`
@@ -71,7 +91,6 @@ const gracefulShutdown = async (signal) => {
   }
 };
 
-// Handle different termination signals
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGUSR2', () => gracefulShutdown('SIGUSR2')); // For nodemon restarts
+process.on('SIGUSR2', () => gracefulShutdown('SIGUSR2'));

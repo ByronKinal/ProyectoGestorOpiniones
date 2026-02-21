@@ -51,7 +51,6 @@ const postSchema = new mongoose.Schema(
   }
 );
 
-// Índices para mejora de rendimiento
 postSchema.index({ userId: 1, createdAt: -1 });
 postSchema.index({ category: 1, createdAt: -1 });
 postSchema.index({ title: 'text', content: 'text' });

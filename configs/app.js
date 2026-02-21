@@ -4,9 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { dbConnection } from './db.js';
-import { connectMongoDB } from './mongodb.js';
-// Ensure models are registered before DB sync
+import { dbConnection, connectMongoDB } from './db.js';
 import '../src/users/user.model.js';
 import '../src/auth/role.model.js';
 import '../src/posts/post.model.js';
@@ -47,7 +45,6 @@ const routes = (app) => {
       service: 'Gestor de Opiniones',
     });
   });
-  // 404 handler (standardized)
   app.use(notFound);
 };
 
@@ -57,13 +54,10 @@ export const initServer = async () => {
   app.set('trust proxy', 1);
 
   try {
-    // Conectar a PostgreSQL
     await dbConnection();
     
-    // Conectar a MongoDB
     await connectMongoDB();
     
-    // Seed essential data (roles + default admin)
     const { seedInitialData } = await import('../seeders/dataSeeder.js');
     await seedInitialData();
     

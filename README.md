@@ -1,13 +1,3 @@
-## 🚀 Instalación
-
-```bash
-# Instalar dependencias
-pnpm install
-
-# MongoDB debe estar corriendo localmente
-# Asegurar que Docker tiene PostgreSQL activo
-```
-
 ### Usuario administrador por defecto
 Se crea automaticamente si la tabla de usuarios esta vacia.
 
@@ -17,7 +7,7 @@ Se crea automaticamente si la tabla de usuarios esta vacia.
 
 ---
 
-## ⚙️ Configuración
+## Configuración
 
 Crear un archivo `.env` en la raíz del proyecto:
 
@@ -26,7 +16,6 @@ Crear un archivo `.env` en la raíz del proyecto:
 NODE_ENV=development
 PORT=3005
 
-# Database MongoDB
 MONGODB_URI=mongodb://localhost:27017/opinion_system
 
 # Database PostgreSQL
@@ -48,10 +37,10 @@ JWT_AUDIENCE=AuthService
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_ENABLE_SSL=true
-SMTP_USERNAME=gestoropiniones@gmail.com
+SMTP_USERNAME=kinalsports@gmail.com
 SMTP_PASSWORD=yrsd prvf kwat toee
-EMAIL_FROM=gestoropiniones@gmail.com
-EMAIL_FROM_NAME=Gestor de Opiniones
+EMAIL_FROM=kinalsports@gmail.com
+EMAIL_FROM_NAME=AuthDotnet App
 
 # Cloudinary (upload de perfiles)
 CLOUDINARY_CLOUD_NAME=dut08rmaz
@@ -76,44 +65,24 @@ VERIFICATION_EMAIL_EXPIRY_HOURS=24
 PASSWORD_RESET_EXPIRY_HOURS=1
 ```
 
-## ▶️ Ejecución
+## Ejecución
 
 ```bash
-# Iniciar servicios de Docker
 docker compose up -d
 
-# Iniciar el servidor en desarrollo
-pnpm dev
+pnpm install
 
-# Iniciar en producción
-pnpm start
+pnpm run dev
 
-# Ejecutar linter
-pnpm lint
-```
+crear el .env 
 
 El servidor estará disponible en: `http://localhost:3005/api/v1`
 
 ---
 
-## 🔌 Endpoints - Referencia Completa
+## Endpoints - Referencia Completa
 
-### Base URL
-```
-http://localhost:3005/api/v1
-```
 
----
-
-## 🏥 Health Check
-
-### GET `/health`
-Verifica el estado del servicio.
-
-**cURL:**
-```bash
-curl http://localhost:3005/api/v1/health
-```
 
 **Respuesta (200):**
 ```json
@@ -126,7 +95,7 @@ curl http://localhost:3005/api/v1/health
 
 ---
 
-## 🔐 Autenticación (Authentication)
+## Autenticación (Authentication)
 
 ### POST `/auth/register`
 Registra un nuevo usuario.
@@ -188,6 +157,105 @@ curl -X POST http://localhost:3005/api/v1/auth/login \
 
 
 
+### POST `/auth/verify-email`
+Verifica el email del usuario usando el token enviado por correo.
+
+**cURL:**
+```bash
+curl -X POST http://localhost:3005/api/v1/auth/verify-email \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_VERIFICATION_TOKEN"
+  }'
+```
+
+**Respuesta (200):**
+```json
+{
+  "success": true,
+  "message": "Email verificado exitosamente"
+}
+```
+
+**Errores:**
+- **400:** Token inválido o expirado
+
+---
+
+### POST `/auth/resend-verification`
+Reenvía el email de verificación a un usuario.
+
+**cURL:**
+```bash
+curl -X POST http://localhost:3005/api/v1/auth/resend-verification \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "juan@example.com"
+  }'
+```
+
+**Respuesta (200):**
+```json
+{
+  "success": true,
+  "message": "Email de verificación reenviado exitosamente"
+}
+```
+
+**Errores:**
+- **404:** Usuario no encontrado
+
+---
+
+### POST `/auth/forgot-password`
+Inicia el proceso de recuperación de contraseña enviando un email con el token.
+
+**cURL:**
+```bash
+curl -X POST http://localhost:3005/api/v1/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "juan@example.com"
+  }'
+```
+
+**Respuesta (200):**
+```json
+{
+  "success": true,
+  "message": "Instrucciones de recuperación enviadas al email"
+}
+```
+
+---
+
+### POST `/auth/reset-password`
+Cambia la contraseña usando el token de recuperación.
+
+**cURL:**
+```bash
+curl -X POST http://localhost:3005/api/v1/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_RESET_TOKEN",
+    "newPassword": "NewPassword123!"
+  }'
+```
+
+**Respuesta (200):**
+```json
+{
+  "success": true,
+  "message": "Contraseña actualizada exitosamente"
+}
+```
+
+**Errores:**
+- **400:** Token inválido o expirado
+- **400:** Contraseña no cumple requisitos de seguridad
+
+---
+
 ### GET `/auth/profile`
 Obtiene el perfil del usuario autenticado.
 
@@ -212,7 +280,41 @@ curl -X GET http://localhost:3005/api/v1/auth/profile \
 
 ---
 
-## 📝 Publicaciones (Posts)
+### POST `/auth/profile/by-id`
+Obtiene el perfil de un usuario específico usando su ID.
+
+**cURL:**
+```bash
+curl -X POST http://localhost:3005/api/v1/auth/profile/by-id \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "target-user-id"
+  }'
+```
+
+**Respuesta (200):**
+```json
+{
+  "success": true,
+  "user": {
+    "id": "target-user-id",
+    "name": "Juan",
+    "surname": "Pérez",
+    "username": "juanperez",
+    "email": "juan@example.com",
+    "profilePicture": "https://...",
+    "roles": ["USER"]
+  }
+}
+```
+
+**Errores:**
+- **400:** userId no proporcionado
+- **404:** Usuario no encontrado
+
+---
+
+## Publicaciones (Posts)
 
 ### GET `/posts`
 Obtiene todas las publicaciones con paginación y filtros.
@@ -434,7 +536,7 @@ curl "http://localhost:3005/api/v1/posts/user/your-user-id?page=1&limit=10"
 
 ---
 
-## 💬 Comentarios (Comments)
+## Comentarios (Comments)
 
 ### GET `/comments/post/:postId`
 Obtiene comentarios de una publicación.
@@ -575,7 +677,7 @@ curl -X DELETE http://localhost:3005/api/v1/comments/507f1f77bcf86cd799439012 \
 
 ---
 
-## 👥 Usuarios (Users)
+## Usuarios (Users)
 
 ### GET `/users/:userId/roles`
 Obtiene los roles de un usuario.
@@ -621,35 +723,8 @@ curl -X PUT http://localhost:3005/api/v1/users/target-user-id/role \
 }
 ```
 
----
 
-## ⚠️ Códigos de Error Comunes
-
-| Código | Descripción |
-|--------|-------------|
-| 400 | Validación fallida - datos inválidos |
-| 401 | No autenticado - token faltante o inválido |
-| 403 | No autorizado - no tienes permiso |
-| 404 | Recurso no encontrado |
-| 409 | Conflicto - email o username duplicado |
-| 500 | Error interno del servidor |
-
----
-
-## 🔐 Headers Requeridos
-
-Para endpoints que requieren autenticación:
-
-```
-Authorization: Bearer <JWT_TOKEN>
-Content-Type: application/json
-```
-
-Obtén el token en `/auth/login` o `/auth/register`.
-
----
-
-## 📚 Categorías de Publicaciones
+## Categorías de Publicaciones
 
 ```
 - Technology
@@ -661,29 +736,3 @@ Obtén el token en `/auth/login` o `/auth/register`.
 - Business
 - Other
 ```
-
----
-
-## 🔒 Limitación de Solicitudes
-
-- **Rutas de autenticación:** 5 solicitudes por minuto
-- **Rutas generales:** 20 solicitudes por minuto
-
----
-
-## 🔏 Seguridad
-
-- ✅ JWT (JSON Web Tokens)
-- ✅ Argon2 (Hashing de contraseñas)
-- ✅ CORS configurado
-- ✅ Helmet (Headers de seguridad)
-- ✅ Rate Limiting
-- ✅ Validación exhaustiva
-- ✅ Verificación de propiedad
-- ✅ MongoDB injection prevention
-
----
-
-
-
-

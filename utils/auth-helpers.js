@@ -1,15 +1,13 @@
 import crypto from 'crypto';
 
-// Generate secure tokens matching .NET TokenGenerator
 export const generateEmailVerificationToken = () => {
-  return generateSecureToken(32); // 32 bytes = 256 bits
+  return generateSecureToken(32);
 };
 
 export const generatePasswordResetToken = () => {
-  return generateSecureToken(32); // 32 bytes = 256 bits
+  return generateSecureToken(32);
 };
 
-// Generate secure token exactly like .NET TokenGenerator
 const generateSecureToken = (length) => {
   const bytes = crypto.randomBytes(length);
   return bytes

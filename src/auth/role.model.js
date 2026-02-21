@@ -95,7 +95,6 @@ export const UserRole = sequelize.define(
   }
 );
 
-// Associations
 User.hasMany(UserRole, { foreignKey: 'user_id', as: 'UserRoles' });
 UserRole.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
 

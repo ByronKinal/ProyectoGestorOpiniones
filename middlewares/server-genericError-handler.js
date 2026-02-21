@@ -1,16 +1,11 @@
 import { randomUUID } from 'crypto';
 
-/**
- * Middleware global para el manejo de errores
- */
-// eslint-disable-next-line no-unused-vars
 export const errorHandler = (err, req, res, _next) => {
   console.error('Error:', err);
   const traceId = err.traceId || randomUUID();
   const timestamp = new Date().toISOString();
   const errorCode = err.errorCode || null;
 
-  // Error de validación de Mongoose
   if (err.name === 'ValidationError') {
     return res.status(400).json({
       success: false,
@@ -21,7 +16,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error de cast de Mongoose (ID inválido)
   if (err.name === 'CastError') {
     return res.status(400).json({
       success: false,
@@ -32,7 +26,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error de duplicado de Mongoose
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue)[0];
     const value = err.keyValue[field];
@@ -45,7 +38,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error de JWT
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
       success: false,
@@ -66,7 +58,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error de multer (archivos)
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({
       success: false,
@@ -77,7 +68,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error de conexión a base de datos
   if (err.name === 'MongoNetworkError') {
     return res.status(503).json({
       success: false,
@@ -88,7 +78,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error personalizado con status
   if (err.status) {
     return res.status(err.status).json({
       success: false,
@@ -99,7 +88,6 @@ export const errorHandler = (err, req, res, _next) => {
     });
   }
 
-  // Error genérico del servidor
   return res.status(500).json({
     success: false,
     message: 'Error interno del servidor',
@@ -109,9 +97,6 @@ export const errorHandler = (err, req, res, _next) => {
   });
 };
 
-/**
- * Middleware para manejar rutas no encontradas
- */
 export const notFound = (req, res) => {
   const traceId = randomUUID();
   const timestamp = new Date().toISOString();
@@ -124,9 +109,6 @@ export const notFound = (req, res) => {
   });
 };
 
-/**
- * Wrapper para manejar errores en funciones asíncronas
- */
 export const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
